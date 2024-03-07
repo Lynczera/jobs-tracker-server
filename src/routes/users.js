@@ -21,7 +21,7 @@ router.post('/create', (req, res) => {
     }
 
     if(!err){
-      var query = db.query(`INSERT INTO Accounts VALUES("${username}",${password})`, (err, rows, fields)=>{
+      var query = db.query(`INSERT INTO Accounts VALUES("${username}","${password}")`, (err, rows, fields)=>{
         if(err){
           console.log(err["errno"]);
         }
@@ -81,33 +81,46 @@ router.post('/create', (req, res) => {
   });
 
 
-
   router.get('/auth', (req, res) => {
 
     const sID = req.cookies.sID;
 
-    var isAuth = false;
-    var checkSession = db.query(`SELECT sID FROM Sessions WHERE sID = "${sID}"`, (err, rows, fields)=>{
+    var checkSession = db.query(`SELECT sID,User FROM Sessions WHERE sID = "${sID}"`, (err, rows, fields)=>{
 
     if (err){
       console.log(err);
     }else{
-      if(rows[0] && rows[0].sID){
-        if(rows[0].sID == sID){
-          isAuth = true;
-        }
+      if(rows[0]){
         res.json({
-          sID : rows[0].sID,
-          auth: isAuth
+          auth: true,
+          user: rows[0].User
         });
       }else{
         res.json({
-          sID : null,
-          auth: isAuth
+          auth: false
         });
       }
       
     }
+    })
+
+  });
+
+  router.get("/logout", (req, res)=>{
+    const sID = req.cookies.sID;
+    var deleteSession = db.query(`DELETE FROM Sessions WHERE sID="${sID}"`, (err,rows, fields)=>{
+      if(err){
+          res.json({
+            logout : false
+          });
+          console.log(err);
+      }
+      else{
+        res.clearCookie("sID");
+        res.json({
+          logout : true
+        });
+      }
     })
 
   });
