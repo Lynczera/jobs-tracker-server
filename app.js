@@ -7,6 +7,7 @@ var logger = require('morgan');
 var indexRouter = require('./index');
 var usersRouter = require('./src/routes/users');
 var authRouter = require('./src/routes/auth');
+var applicationRouter = require('./src/routes/applications');
 const session = require('express-session');
 
 require('dotenv').config();
@@ -18,7 +19,9 @@ var cors = require('cors')
 app.use(cors({
   origin: ['http://localhost:5174'],
   credentials: true
+
 }));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -39,6 +42,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/applications', applicationRouter);
+
 // app.use('/login', authRouter);
 // app.use('/auth', authRouter);
 
