@@ -124,4 +124,21 @@ router.post("/remove", async (req, res) => {
   );
 });
 
+router.post("/update_app", (req, res)=>{
+  const sID = req.cookies.sID;
+  const {job, status} = req.body;
+  console.log(req.body);
+
+  var query = db.query(`UPDATE Applications SET Status = "${status}" WHERE (JobID="${job}" AND User=(SELECT User FROM Sessions WHERE sID="${sID}"))`, (err, rows, fields)=>{
+    if(err){
+      console.log(err)
+    }else{
+      console.log("worked");
+      res.send("updated");
+    }
+  })
+
+
+})
+
 module.exports = router;
