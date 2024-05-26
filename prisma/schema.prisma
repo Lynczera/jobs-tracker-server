@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  jobID       String   @unique(map: "jobID") @db.VarChar(255)
+  company     String   @db.VarChar(255)
+  status      String   @db.VarChar(255)
+  user        String   @unique(map: "user") @db.VarChar(255)
+  dateApplied DateTime @db.Date
+  User        User     @relation(fields: [user], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "Application_ibfk_1")
+
+  @@unique([jobID, user], map: "user_app")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique(map: "name") @db.VarChar(255)
+  password    String       @db.VarChar(255)
+  Application Application?
+}
