@@ -3,6 +3,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors')
 var app = express()
+var cookieParser = require('cookie-parser');
 const port = 3000
 
 app.use(cors({
@@ -10,6 +11,7 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

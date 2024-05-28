@@ -91,4 +91,11 @@ router.get("/logout", (req, res) => {
   });
 })
 
+router.get("/auth", (req, res) => {
+  const token = req.cookies.token;
+  const verify = jwtAuth.verify(req, res, token);
+  res.json({
+    auth: verify
+  })
+});
 module.exports = router;
