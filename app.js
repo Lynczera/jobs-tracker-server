@@ -16,9 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 var usersRouter = require('./src/routes/users');
+var appsRouter = require('./src/routes/applications');
 
 app.use('/users', usersRouter);
-
+app.use('/applications', appsRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
