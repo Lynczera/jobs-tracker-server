@@ -25,10 +25,13 @@ router.post("/create", async (req, res) => {
       },
     })
 
-    res.json({
-      user: user.name,
-      created: true,
-    })
+    if (user) {
+
+      res.json({
+        user: user.name,
+        created: true,
+      })
+    }
 
 
   } catch (e) {
@@ -94,8 +97,13 @@ router.get("/logout", (req, res) => {
 router.get("/auth", (req, res) => {
   const token = req.cookies.token;
   const verify = jwtAuth.verify(req, res, token);
+  var user = null
+  if (verify) {
+    user = jwtAuth.decode(token).name
+  }
   res.json({
-    auth: verify
+    auth: verify,
+    user: user
   })
 });
 module.exports = router;

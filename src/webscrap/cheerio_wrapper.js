@@ -1,6 +1,5 @@
 const cheerio = require("cheerio");
 const axios = require("axios");
-const { json } = require("body-parser");
 
 const axiosRetry = require("axios-retry").default;
 axiosRetry(axios, {
@@ -19,9 +18,9 @@ module.exports.cheerio_wrapper = {
 
 	get_job: async (url) => {
 
-		const page = await axios(url)
-
 		try {
+
+			const page = await axios(url)
 			const data = page.data;
 			const $ = cheerio.load(data);
 
@@ -47,7 +46,6 @@ module.exports.cheerio_wrapper = {
 			return result
 		}
 		catch (error) {
-			console.log(JSON.stringify(error));
 
 			if (JSON.stringify(error)["status"] == 429) {
 				console.log("ERROR FOUND SENDING TO CLIENT");

@@ -21,6 +21,10 @@ module.exports.jwtAuth = {
 
 		}
 
+	},
+
+	decode: (token) => {
+		return jwt.decode(token)
 	}
 
 };
