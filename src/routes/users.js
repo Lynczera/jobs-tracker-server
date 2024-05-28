@@ -1,14 +1,94 @@
+const { Prisma, PrismaClient } = require('@prisma/client')
+
 var express = require('express');
 var router = express.Router();
 
-router.post("/create", (req, res)=>{ 
-const {username, password} = req.body;
-  console.log(username)
-  console.log(password)
+require('dotenv').config()
+const { createHmac } = require('node:crypto');
+
+const prisma = new PrismaClient()
+
+const jwt_auth = require('../middleware/jwtAuth');
+const { jwtAuth } = require('../middleware/jwtAuth');
+
+router.post("/create", async (req, res) => {
+  const { username, password } = req.body;
+  const hash = createHmac('sha256', process.env.HASHING_SECRET)
+    .update(password)
+    .digest('hex');
+
+  try {
+    const user = await prisma.user.create({
+      data: {
+        name: username,
+        password: hash
+      },
+    })
+
+    res.json({
+      user: user.name,
+      created: true,
+    })
+
+
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      //username already exists
+      if (e.code === 'P2002') {
+        res.json({
+          user: username,
+          error: 1062,
+        });
+      }
+    } else {
+      throw e
+    }
+  }
+
 });
 
-router.get("/login", (req, res)=> {
-res.send("user route accessed")
+TODO: //remember to redirect user if goes back to login page after login ?????
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  const hash = createHmac('sha256', process.env.HASHING_SECRET)
+    .update(password)
+    .digest('hex');
+
+  const get_user = await prisma.user.findUnique({
+    where: {
+      name: username,
+      password: hash
+    }
+  })
+
+  if (get_user) {
+    //set user cookie
+    delete get_user.password
+    const token = jwtAuth.sign(get_user);
+    res.cookie("token", token, {
+      httpOnly: true
+    })
+
+    res.json({
+      user: username,
+      login: true
+    })
+  }
+  else {
+    res.json({
+      user: username,
+      login: false
+    })
+  }
+
 });
+
+router.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.json({
+    logout: true
+  });
+})
 
 module.exports = router;
